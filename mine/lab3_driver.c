@@ -33,27 +33,27 @@ static struct file_operations fileOperationStruct = {
     .owner = THIS_MODULE
 };
 MODULE_LICENSE("GPL");
-//make all
+//The kernel ring buffer is line buffered, which means it's not flushed until it encounters a newline. Add a \n to the end of your printk strings: https://askubuntu.com/questions/1111529/printk-message-doesnt-display-till-next-event
 int init_module(void){
-    printk("Module loaded");
+    printk("Module loaded\n");
     //6.1.3, выделение памяти под сообщение
     messageBufferPointer = kmalloc(sizeof(messageContent), GFP_KERNEL);
     if (messageBufferPointer == 0){
-         printk("Something went wrong with kmalloc when allocating message");
+         printk("Something went wrong with kmalloc when allocating message\n");
          return -1;
     }
     //6.1.4 Выделение номера символьного устройства.
     returnResult = alloc_chrdev_region(&dev, 0, 1, DEVICE_NAME);
     if (returnResult!= 0){
-        printk("Something went wrong with alloc_chrdev_region when allocating number for the device");
+        printk("Something went wrong with alloc_chrdev_region when allocating number for the device\n");
     }
     majorAdress = MAJOR(dev);
     minorAdress = MINOR(dev);
-    printk("allocated device number is %d  %d", majorAdress, minorAdress);
+    printk("allocated device number is %d  %d\n", majorAdress, minorAdress);
     //6.1.5 Инициализация структуры символьного устройства
     cdev = cdev_alloc();
     if (cdev == NULL){
-        printk("struct allocation with cdevAlloc failed");
+        printk("struct allocation with cdevAlloc failed\n");
     }
     //заполнение, используя указатель на эту структуру
     cdev->owner = THIS_MODULE;
@@ -62,7 +62,7 @@ int init_module(void){
     //регистрация символьного устройства в ядре
     returnResult = cdev_add(cdev, dev, 1);
     if (returnResult!=0){
-        printk("cdev registartion with cdev_add failed with error code %d", returnResult);
+        printk("cdev registartion with cdev_add failed with error code %d\n", returnResult);
     }
 
     //6.1.6 Создание файла устройства
@@ -74,7 +74,7 @@ int init_module(void){
     //создание файла устройства
     device = device_create(class, NULL, dev, NULL, DEVICE_NAME);
     if (device == NULL){
-        printk("something went wrong with device_create");
+        printk("something went wrong with device_create\n");
     }
 
     printk ("module initialisation complete\n");
@@ -83,6 +83,7 @@ int init_module(void){
 
 //clean 
 void cleanup_module(void){
+     printk("Module unload start\n");
     //6.2.3.1 Освободить созданное устройство
     device_destroy(class, dev);
     //6.2.3.2 Дерегистрация класса устройства
@@ -94,7 +95,7 @@ void cleanup_module(void){
     //6.2.3.5 Освобождение памяти под сообщение
     kfree(messageBufferPointer);
 
-    printk("Module unloaded");
+    printk("Module unloaded\n");
 }
 
 //Функция записи в устройство
@@ -103,15 +104,16 @@ void cleanup_module(void){
 static ssize_t write_func(struct file *file, const char *buf,size_t bufLen, loff_t *offst)
 {
 
-    printk("<1>device_write started \n");
+    printk("device_write started \n");
 
-    printk("arguments(%p, %s, %ld)", file, buf, bufLen);
+    printk("arguments(%p, %s, %ld)\n", file, buf, bufLen);
     //записать данные от пользователя во внутренний буфер, который был выделен при помощи kmalloc при инициализации. 
     returnResultLong = copy_from_user(messageBufferPointer, buf, bufLen);
     if (returnResultLong!=0){
-        printk("something went wrong with copy_from_user, can't write %ld bytes", returnResultLong);
+        printk("something went wrong with copy_from_user, can't write %ld bytes\n", returnResultLong);
         return 0;
     }
+    printk("write ok!\n");
     //сохранить количество записанных байт в поле модуля
     amountOfBytesWritten = bufLen;
     //увеличить *offst на количество записанных байт
@@ -121,24 +123,35 @@ static ssize_t write_func(struct file *file, const char *buf,size_t bufLen, loff
 }
 //6.2.2 Реализация функции чтения
 static ssize_t read_func(struct file *file, char *buf, size_t bufLen, loff_t * offst){
-    printk("reading started \n");
+    printk("reading func called \n");
 
-    printk("arguments(%p, %s, %ld)", file, buf, bufLen);
+    printk("arguments(file: %p, buf: %s, bufLen: %ld, offset %lld)\n", file, buf, bufLen, *offst);
+
 
     amountOfBytesRead = 0;
     //если значение *offst != 0 - возвратить 0, что определит окончание чтения
-    if( *messageBufferPointer == 0){
+    if( *offst != 0){
+        printk("reading finished!\n");
         return 0;
     }
     //записать данные из внутреннего буфера в выходной буфер пользователя 
-    returnResultLong = copy_from_user(messageBufferPointer, buf, bufLen );
+    returnResultLong = copy_to_user(buf, messageBufferPointer, amountOfBytesWritten );
         if (returnResultLong!=0){
-        printk("something went wrong with copy_to_user, can't write %ld bytes", returnResultLong);
+        printk("something went wrong with copy_to_user, can't write %ld bytes\n", returnResultLong);
         return 0;
     }
     //увеличить *offst на количество прочитанных байт
-    offst += bufLen;
+    *offst += amountOfBytesWritten;
     //возвратить из функции количество прочитанных байт.
-    return bufLen;
+    return amountOfBytesWritten;
 
 }
+/*
+*insmod ./lab3_driver.ko 
+*ls -l /dev/ttyIIVS_TMP
+*echo "text_of_message" > /dev/ttyIIVS_TMP
+*cat /dev/ttyIIVS_TMP
+*rmmod ./lab3_driver.ko
+*
+*
+*/
