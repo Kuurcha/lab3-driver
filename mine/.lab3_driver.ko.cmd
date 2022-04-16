@@ -1,0 +1,1 @@
+cmd_/home/kurcha/IIVS/lab3/mine/lab3_driver.ko := ld -r  -m elf_x86_64  --build-id=sha1  -T scripts/module.lds -o /home/kurcha/IIVS/lab3/mine/lab3_driver.ko /home/kurcha/IIVS/lab3/mine/lab3_driver.o /home/kurcha/IIVS/lab3/mine/lab3_driver.mod.o;  true

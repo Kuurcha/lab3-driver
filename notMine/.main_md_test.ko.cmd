@@ -1,0 +1,1 @@
+cmd_/home/kurcha/IIVS/lab3/notMine/main_md_test.ko := ld -r  -m elf_x86_64  --build-id=sha1  -T scripts/module.lds -o /home/kurcha/IIVS/lab3/notMine/main_md_test.ko /home/kurcha/IIVS/lab3/notMine/main_md_test.o /home/kurcha/IIVS/lab3/notMine/main_md_test.mod.o;  true

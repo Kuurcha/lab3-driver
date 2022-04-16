@@ -1,0 +1,1 @@
+cmd_/home/kurcha/IIVS/lab3/notMine/Module.symvers := sed 's/\.ko$$/\.o/' /home/kurcha/IIVS/lab3/notMine/modules.order | scripts/mod/modpost -m -a  -o /home/kurcha/IIVS/lab3/notMine/Module.symvers -e -i Module.symvers   -T -

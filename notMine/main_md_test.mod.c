@@ -27,21 +27,21 @@ MODULE_INFO(retpoline, "Y");
 
 static const struct modversion_info ____versions[]
 __used __section("__versions") = {
-	{ 0x9f593a9b, "module_layout" },
+	{ 0x8e6402a9, "module_layout" },
 	{ 0x37a0cba, "kfree" },
 	{ 0x6091b333, "unregister_chrdev_region" },
-	{ 0x36d04f2b, "cdev_del" },
-	{ 0xb50c5cd2, "class_destroy" },
-	{ 0x676d16c2, "device_destroy" },
-	{ 0xfba270b5, "device_create" },
-	{ 0x827ba31, "__class_create" },
-	{ 0x56b94690, "cdev_add" },
-	{ 0xb088826d, "cdev_alloc" },
+	{ 0xfe5cf5ad, "cdev_del" },
+	{ 0x64b60eb0, "class_destroy" },
+	{ 0xf595d267, "device_destroy" },
+	{ 0xd9da0486, "device_create" },
+	{ 0xa946dcde, "__class_create" },
+	{ 0xc0fdf3d5, "cdev_add" },
+	{ 0x82046fe4, "cdev_alloc" },
 	{ 0xe3ec2f2b, "alloc_chrdev_region" },
-	{ 0xed5f6e, "kmem_cache_alloc_trace" },
-	{ 0x25931311, "kmalloc_caches" },
-	{ 0xf73cafe, "try_module_get" },
-	{ 0x1a4937cb, "module_put" },
+	{ 0xe78dfe6d, "kmem_cache_alloc_trace" },
+	{ 0x595451f1, "kmalloc_caches" },
+	{ 0xffee12e9, "try_module_get" },
+	{ 0x49b3b968, "module_put" },
 	{ 0xc3aaf0a9, "__put_user_1" },
 	{ 0x167e7f9d, "__get_user_1" },
 	{ 0xc5850110, "printk" },
@@ -51,4 +51,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "4E981252C8F7C4BEC60A96B");
+MODULE_INFO(srcversion, "E4951A07A1148B51A4A8A8C");
